@@ -135,7 +135,7 @@ def print_newer_versions(local_deps, remote_deps):
                 )
 
     if not upgrade_suggestions:
-        print('No upgrades avaible')
+        print('No upgrades available')
     else:
         print('\n'.join(upgrade_suggestions))
 
