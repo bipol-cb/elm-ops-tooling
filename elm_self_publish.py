@@ -7,6 +7,7 @@ import shutil
 import os
 import errno
 import argparse
+from collections import OrderedDict
 
 def copy_package(location, destination, ignorer=None):
     shutil.rmtree(destination, ignore_errors=True)
@@ -91,7 +92,7 @@ def self_publish(package_location, destination=".", quiet=False):
         json.dump(package_info, f, sort_keys=False, indent=4)
 
     with open(destination_elm_package_file) as f:
-        destination_elm_package = json.load(f)
+        destination_elm_package = json.load(f, object_pairs_hook=OrderedDict)
 
     with open(destination_elm_package_file, 'w') as f:
         destination_elm_package['dependencies'][place] = "{version} <= v <= {version}".format(version=version)
