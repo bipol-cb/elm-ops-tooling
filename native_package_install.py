@@ -1,6 +1,6 @@
 #! /usr/bin/env python
 
-
+import collections
 import argparse
 import json
 import os
@@ -85,6 +85,7 @@ def fetch_packages(vendor_dir, packages):
         vendor = format_vendor_dir(vendor_dir, package['namespace'])
         url = format_url(package)
 
+        print "Downloading {namespace}/{name} {version}".format(**package)
         tar_file = urllib2.urlopen(url)
         with open(tar_filename, 'w') as tar:
             tar.write(tar_file.read())
@@ -172,7 +173,7 @@ def update_elm_package(vendor_dir, configs, packages):
 
     for config in configs:
         with open(config) as f:
-            data = json.load(f)
+            data = json.load(f, object_pairs_hook=collections.OrderedDict)
 
         repository = data['repository']
         source_directories = data['source-directories']
