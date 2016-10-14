@@ -1,5 +1,7 @@
 #! /usr/bin/env python
 
+from __future__ import print_function
+
 import collections
 import argparse
 import json
@@ -85,7 +87,7 @@ def fetch_packages(vendor_dir, packages):
         vendor = format_vendor_dir(vendor_dir, package['namespace'])
         url = format_url(package)
 
-        print "Downloading {namespace}/{name} {version}".format(**package)
+        print("Downloading {namespace}/{name} {version}".format(**package))
         tar_file = urllib2.urlopen(url)
         with open(tar_filename, 'w') as tar:
             tar.write(tar_file.read())
