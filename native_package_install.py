@@ -159,7 +159,7 @@ def find_all_native_files(path):
     for root, dirnames, filenames in os.walk(path):
         for filename in fnmatch.filter(filenames, '*.js'):
             native_files.append(os.path.join(root, filename))
-    native_files
+    return native_files
 
 
 def munge_names(vendor_dir, repository, packages):
@@ -168,16 +168,13 @@ def munge_names(vendor_dir, repository, packages):
     """
     namespace, name = namespace_from_repo(repository)
     for package in packages:
-        native_files = []
-        for root, dirnames, filenames in os.walk(package_dir(vendor_dir, package)):
-            for filename in fnmatch.filter(filenames, '*.js'):
-                native_files.append(os.path.join(root, filename))
+        native_files = find_all_native_files(package_dir(vendor_dir, package))
         for native_file in native_files:
-          replace_in_file(
-              native_file,
-              format_native_name(package['namespace'], package['name']),
-              format_native_name(namespace, name)
-          )
+            replace_in_file(
+                native_file,
+                format_native_name(package['namespace'], package['name']),
+                format_native_name(namespace, name)
+            )
 
 
 def update_elm_package(vendor_dir, configs, packages):
