@@ -7,7 +7,6 @@ import collections
 import fnmatch
 import json
 import os
-import subprocess
 import sys
 import tarfile
 import urllib2
