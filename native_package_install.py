@@ -2,8 +2,9 @@
 
 from __future__ import print_function
 
-import collections
 import argparse
+import collections
+import fnmatch
 import json
 import os
 import subprocess
@@ -141,29 +142,43 @@ def get_source_dirs(vendor_dir, package):
     return data['source-directories']
 
 
+def replace_in_file(filePath, src, target):
+    """ find replace in a file """
+    lines = []
+    with open(filePath) as infile:
+        for line in infile:
+            line = line.replace(src, target)
+            lines.append(line)
+    with open(filePath, 'w') as outfile:
+        for line in lines:
+            outfile.write(line)
+
+
+def find_all_native_files(path):
+    """ recursivly find all js files in a package """
+    native_files = []
+    for root, dirnames, filenames in os.walk(path):
+        for filename in fnmatch.filter(filenames, '*.js'):
+            native_files.append(os.path.join(root, filename))
+    native_files
+
+
 def munge_names(vendor_dir, repository, packages):
     """
     Replaces the namespaced function names in all native code by the namespace from the given elm-package.json.
     """
     namespace, name = namespace_from_repo(repository)
     for package in packages:
-        subprocess.Popen((
-          "find",
-          package_dir(vendor_dir, package),
-          "-type",
-          "f",
-          "-exec",
-          "sed",
-          "-i",
-          "",
-          "-e",
-          "s/{0}/{1}/g".format(
+        native_files = []
+        for root, dirnames, filenames in os.walk(package_dir(vendor_dir, package)):
+            for filename in fnmatch.filter(filenames, '*.js'):
+                native_files.append(os.path.join(root, filename))
+        for native_file in native_files:
+          replace_in_file(
+              native_file,
               format_native_name(package['namespace'], package['name']),
               format_native_name(namespace, name)
-          ),
-          "{}",
-          ";"
-        ))
+          )
 
 
 def update_elm_package(vendor_dir, configs, packages):
