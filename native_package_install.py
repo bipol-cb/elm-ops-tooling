@@ -154,6 +154,8 @@ def find_all_native_files(path):
     """ recursivly find all js files in a package """
     native_files = []
     for root, dirnames, filenames in os.walk(path):
+        if "Native" not in root:
+            continue
         for filename in fnmatch.filter(filenames, '*.js'):
             native_files.append(os.path.join(root, filename))
     return native_files
