@@ -143,14 +143,11 @@ def get_source_dirs(vendor_dir, package):
 
 def replace_in_file(filePath, src, target):
     """ find replace in a file """
-    lines = []
+    output = ""
     with open(filePath) as infile:
-        for line in infile:
-            line = line.replace(src, target)
-            lines.append(line)
+        output = infile.read().replace(src, target)
     with open(filePath, 'w') as outfile:
-        for line in lines:
-            outfile.write(line)
+        outfile.write(output)
 
 
 def find_all_native_files(path):
