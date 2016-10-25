@@ -88,8 +88,7 @@ def fetch_packages(vendor_dir, packages):
     token = None
 
     if (user and auth_token):
-        token = base64.b64encode("{user}:{auth_token}".format(user, auth_token))
-        request.add_header("Authorization", "Basic {token}".format(token))
+        token = base64.b64encode("{user}:{auth_token}".format(user=user, auth_token=auth_token))
 
     for package in packages:
         tar_filename = format_tar_file(vendor_dir, package)
