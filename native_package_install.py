@@ -10,6 +10,7 @@ import os
 import sys
 import tarfile
 import urllib2
+import base64
 
 
 def read_native_elm_package(package_file):
@@ -82,19 +83,33 @@ def fetch_packages(vendor_dir, packages):
     """
     Fetches all packages from github.
     """
+    user = os.getenv("GITHUB_ELM_AUTH_USER")
+    auth_token = os.getenv("GITHUB_ELM_AUTH_TOKEN")
+    token = None
+
+    if (user and auth_token):
+        token = base64.b64encode("{user}:{auth_token}".format(user, auth_token))
+        request.add_header("Authorization", "Basic {token}".format(token))
+
     for package in packages:
         tar_filename = format_tar_file(vendor_dir, package)
         vendor = format_vendor_dir(vendor_dir, package['namespace'])
         url = format_url(package)
+        request = urllib2.Request(url)
+        if token:
+            request.add_header("Authorization", "Basic {token}".format(token))
+        try:
+            print("Downloading {namespace}/{name} {version}".format(**package))
+            tar_file = urllib2.urlopen(request)
+            with open(tar_filename, 'w') as tar:
+                tar.write(tar_file.read())
 
-        print("Downloading {namespace}/{name} {version}".format(**package))
-        tar_file = urllib2.urlopen(url)
-        with open(tar_filename, 'w') as tar:
-            tar.write(tar_file.read())
-
-        with tarfile.open(tar_filename) as tar:
-            tar.extractall(vendor, members=tar.getmembers())
-
+            with tarfile.open(tar_filename) as tar:
+                tar.extractall(vendor, members=tar.getmembers())
+        except urllib2.HTTPError as e:
+            print(e)
+            if (e.code == 404 and not token):
+                print("Environment variables GITHUB_ELM_AUTH_USER or GITHUB_ELM_AUTH_TOKEN were not found, please ensure these are set.")
     return packages
 
 
