@@ -96,7 +96,7 @@ def fetch_packages(vendor_dir, packages):
         url = format_url(package)
         request = urllib2.Request(url)
         if token:
-            request.add_header("Authorization", "Basic {token}".format(token))
+            request.add_header("Authorization", "Basic {token}".format(token=token))
         try:
             print("Downloading {namespace}/{name} {version}".format(**package))
             tar_file = urllib2.urlopen(request)
